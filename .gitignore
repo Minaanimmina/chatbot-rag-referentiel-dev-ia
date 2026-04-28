@@ -46,3 +46,6 @@ data/*.md
 
 # ChromaDB database files
 chromadb_vector_database/
+
+# Chainlit
+.chainlit/
