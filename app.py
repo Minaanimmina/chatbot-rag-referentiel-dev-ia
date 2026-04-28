@@ -1,5 +1,8 @@
 """
-Script to
+RAG chatbot for analyzing projects against the RNCP AI Developer referential.
+
+Uses ChromaDB, Ollama, and LangChain to identify RNCP competencies
+covered by projects.
 """
 
 import chainlit as cl
@@ -11,7 +14,8 @@ from config import (
     CHROMA_PATH,
     EMBEDDING_MODEL,
     LLM_MODEL,
-    K_CHUNKS
+    K_CHUNKS,
+    OLLAMA_BASE_URL
 )
 
 
@@ -47,7 +51,10 @@ def build_human_message(context: str, question: str) -> HumanMessage:
 @cl.on_chat_start
 async def on_chat_start():
     # Recharge la base de données ChromaDB
-    embeddings = OllamaEmbeddings(model=EMBEDDING_MODEL)
+    embeddings = OllamaEmbeddings(
+        model=EMBEDDING_MODEL,
+        base_url=OLLAMA_BASE_URL
+        )
     vectorstore = Chroma(
         embedding_function=embeddings,
         persist_directory=CHROMA_PATH
@@ -56,7 +63,8 @@ async def on_chat_start():
     retriever = vectorstore.as_retriever(search_kwargs={"k": K_CHUNKS})
     # Charge le LLM
     llm = ChatOllama(
-        model=LLM_MODEL
+        model=LLM_MODEL,
+        base_url=OLLAMA_BASE_URL
     )
     cl.user_session.set("retriever", retriever)
     cl.user_session.set("llm", llm)
@@ -71,6 +79,5 @@ async def on_message(message: cl.Message):
     # Construit la réponse en utilisant le LLM
     docs_text = "\n\n".join([doc.page_content for doc in docs])
     human_message = build_human_message(docs_text, message.content)
-    response = llm.invoke([system_message, human_message])
     response = llm.invoke([system_message, human_message])
     await cl.Message(content=response.content).send()

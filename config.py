@@ -1,4 +1,5 @@
-# config.py
+import os
+
 CHUNK_SIZE = 2500
 CHUNK_OVERLAP = 200
 EMBEDDING_MODEL = "nomic-embed-text"
@@ -7,3 +8,4 @@ PDF_PATH = "data/Referentiel.pdf"
 DATA_PATH = "data/referentiel.md"
 LLM_MODEL = "mistral:7b"
 K_CHUNKS = 5
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")

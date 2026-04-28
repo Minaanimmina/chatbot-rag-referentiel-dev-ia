@@ -25,7 +25,8 @@ def convert_pdf_to_markdown(pdf_path: str) -> str:
                         cellules = []
                         for cell in row:
                             if cell:
-                                cellules.append(cell.strip().replace("\n", " "))
+                                cleaned = cell.strip().replace("\n", " ")
+                                cellules.append(cleaned)
                         if cellules:
                             result.append(" | ".join(cellules))
             else:
