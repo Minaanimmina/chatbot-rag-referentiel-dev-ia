@@ -1,16 +1,13 @@
 """
 Chainlit application for RNCP competency analysis.
-
-Loads ChromaDB vector store and Ollama LLM to process
-user project descriptions.
-Retrieves relevant referential documents and generates competency analysis.
 """
 
 import chainlit as cl
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
 from langchain_ollama import ChatOllama
-from rag import system_message, build_human_message
+from langchain_core.messages import AIMessage, BaseMessage
+from prompts import system_message, build_human_message
 from config import (
     CHROMA_PATH,
     EMBEDDING_MODEL,
@@ -22,24 +19,22 @@ from config import (
 
 @cl.on_chat_start
 async def on_chat_start():
-    # Recharge la base de données ChromaDB
     embeddings = OllamaEmbeddings(
         model=EMBEDDING_MODEL,
         base_url=OLLAMA_BASE_URL
-        )
+    )
     vectorstore = Chroma(
         embedding_function=embeddings,
         persist_directory=CHROMA_PATH
     )
-    # Crée le retriever pour récupérer les K_CHUNKS les plus pertinents
     retriever = vectorstore.as_retriever(search_kwargs={"k": K_CHUNKS})
-    # Charge le LLM
     llm = ChatOllama(
         model=LLM_MODEL,
         base_url=OLLAMA_BASE_URL
     )
     cl.user_session.set("retriever", retriever)
     cl.user_session.set("llm", llm)
+    cl.user_session.set("history", [])  # initialiser l'historique ici
 
 
 @cl.on_message
@@ -49,14 +44,21 @@ async def on_message(message: cl.Message):
     if not retriever or not llm:
         await cl.Message(content="Erreur : session non initialisée.").send()
         return
-    # Récupère les K_CHUNKS les plus pertinents
+
+    history: list[BaseMessage] = cl.user_session.get("history") or []
+
     docs = retriever.invoke(message.content)
-    # Construit la réponse en utilisant le LLM
     docs_text = "\n\n".join([doc.page_content for doc in docs])
     human_message = build_human_message(docs_text, message.content)
-    try: 
-        response = llm.invoke([system_message, human_message])
+
+    try:
+        response = llm.invoke([system_message] + history + [human_message])
     except Exception as e:
-        await cl.Message(content=f"Erreur lors de l'appel au LLM : {str(e)}").send()
+        await cl.Message(content=f"Erreur LLM : {str(e)}").send()
         return
+
+    history.append(human_message)
+    history.append(AIMessage(content=response.content))
+    cl.user_session.set("history", history)
+
     await cl.Message(content=response.content).send()
