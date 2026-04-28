@@ -1,15 +1,16 @@
 """
-RAG chatbot for analyzing projects against the RNCP AI Developer referential.
+Chainlit application for RNCP competency analysis.
 
-Uses ChromaDB, Ollama, and LangChain to identify RNCP competencies
-covered by projects.
+Loads ChromaDB vector store and Ollama LLM to process
+user project descriptions.
+Retrieves relevant referential documents and generates competency analysis.
 """
 
 import chainlit as cl
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
 from langchain_ollama import ChatOllama
-from langchain_core.messages import SystemMessage, HumanMessage
+from rag import system_message, build_human_message
 from config import (
     CHROMA_PATH,
     EMBEDDING_MODEL,
@@ -17,35 +18,6 @@ from config import (
     K_CHUNKS,
     OLLAMA_BASE_URL
 )
-
-
-system_message = SystemMessage(
-    content="""
-    Tu es un expert pédagogique Simplon spécialisé dans le
-    référentiel RNCP Développeur en Intelligence Artificielle.
-    Ton rôle est d'analyser la description d'un projet et d'identifier
-    les compétences RNCP qu'il couvre.
-
-    Pour chaque compétence identifiée :
-    - Indique son numéro (C7, C13, etc.)
-    - Justifie pourquoi elle est couverte en citant un
-    extrait du contexte fourni
-
-    Liste également les compétences mentionnées dans le contexte mais
-    NON couvertes par le projet.
-
-    IMPORTANT : Base ton analyse uniquement sur le contexte fourni ci-dessous.
-    Ne cite pas de compétences absentes du contexte.
-    """)
-
-
-def build_human_message(context: str, question: str) -> HumanMessage:
-    return HumanMessage(
-        content=f"""Contexte extrait du référentiel : {context}
-
-        Description du projet à analyser : {question}
-        """
-        )
 
 
 @cl.on_chat_start
@@ -74,6 +46,9 @@ async def on_chat_start():
 async def on_message(message: cl.Message):
     retriever = cl.user_session.get("retriever")
     llm = cl.user_session.get("llm")
+    if not retriever or not llm:
+        await cl.Message(content="Erreur : session non initialisée.").send()
+        return
     # Récupère les K_CHUNKS les plus pertinents
     docs = retriever.invoke(message.content)
     # Construit la réponse en utilisant le LLM
