@@ -1,4 +1,7 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 CHUNK_SIZE = 2500
 CHUNK_OVERLAP = 200

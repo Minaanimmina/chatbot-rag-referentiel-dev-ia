@@ -54,5 +54,9 @@ async def on_message(message: cl.Message):
     # Construit la réponse en utilisant le LLM
     docs_text = "\n\n".join([doc.page_content for doc in docs])
     human_message = build_human_message(docs_text, message.content)
-    response = llm.invoke([system_message, human_message])
+    try: 
+        response = llm.invoke([system_message, human_message])
+    except Exception as e:
+        await cl.Message(content=f"Erreur lors de l'appel au LLM : {str(e)}").send()
+        return
     await cl.Message(content=response.content).send()
