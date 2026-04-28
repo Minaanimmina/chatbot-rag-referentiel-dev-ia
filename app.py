@@ -61,4 +61,19 @@ async def on_message(message: cl.Message):
     history.append(AIMessage(content=response.content))
     cl.user_session.set("history", history)
 
-    await cl.Message(content=response.content).send()
+    # Créer les éléments sources
+    source_elements = []
+    for i, doc in enumerate(docs):
+        source_elements.append(
+            cl.Text(
+                name=f"Source {i+1}",
+                content=doc.page_content,
+                display="side"
+            )
+        )
+
+    # Envoyer la réponse avec les sources
+    await cl.Message(
+        content=response.content,
+        elements=source_elements
+    ).send()
