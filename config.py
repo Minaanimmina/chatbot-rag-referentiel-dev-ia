@@ -1,6 +1,6 @@
 # config.py
-CHUNK_SIZE = 500
-CHUNK_OVERLAP = 100
+CHUNK_SIZE = 2500
+CHUNK_OVERLAP = 200
 EMBEDDING_MODEL = "nomic-embed-text"
 CHROMA_PATH = "chromadb_vector_database"
 PDF_PATH = "data/Referentiel.pdf"
