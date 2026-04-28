@@ -12,7 +12,8 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 ENV UV_SYSTEM_PYTHON=1
 
 COPY pyproject.toml uv.lock ./
-RUN uv pip install .
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv pip install .
 
 # ============================================
 # Stage 2 : FINAL - image de production
