@@ -41,9 +41,6 @@ __pycache__/
 tempCodeRunnerFile.py
 .vscode/
 
-# Chainlit
-.chainlit/
-
 # Logs Docker
 build.log
 build.lo
