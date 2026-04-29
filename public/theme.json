@@ -1,0 +1,51 @@
+{
+  "custom_fonts": [
+    "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap"
+  ],
+  "variables": {
+    "light": {
+      "--font-sans": "'DM Sans', sans-serif",
+      "--background":         "0 0% 100%",
+      "--foreground":         "195 33% 16%",
+      "--card":               "0 0% 97%",
+      "--card-foreground":    "195 33% 16%",
+      "--popover":            "0 0% 100%",
+      "--popover-foreground": "195 33% 16%",
+      "--primary":            "2 78% 54%",
+      "--primary-foreground": "0 0% 100%",
+      "--secondary":          "210 40% 96%",
+      "--secondary-foreground":"195 33% 16%",
+      "--muted":              "0 0% 93%",
+      "--muted-foreground":   "0 0% 42%",
+      "--accent":             "0 0% 93%",
+      "--accent-foreground":  "195 33% 16%",
+      "--border":             "0 0% 90%",
+      "--input":              "0 0% 90%",
+      "--ring":               "2 78% 54%",
+      "--destructive":        "2 78% 54%",
+      "--destructive-foreground": "0 0% 100%"
+    },
+    "dark": {
+      "--font-sans": "'DM Sans', sans-serif",
+      "--background":         "195 35% 8%",
+      "--foreground":         "0 0% 95%",
+      "--card":               "195 33% 11%",
+      "--card-foreground":    "0 0% 95%",
+      "--popover":            "195 33% 11%",
+      "--popover-foreground": "0 0% 95%",
+      "--primary":            "2 78% 54%",
+      "--primary-foreground": "0 0% 100%",
+      "--secondary":          "195 33% 16%",
+      "--secondary-foreground":"0 0% 95%",
+      "--muted":              "195 33% 14%",
+      "--muted-foreground":   "0 0% 55%",
+      "--accent":             "195 33% 16%",
+      "--accent-foreground":  "0 0% 95%",
+      "--border":             "195 33% 18%",
+      "--input":              "195 33% 16%",
+      "--ring":               "2 78% 54%",
+      "--destructive":        "2 78% 54%",
+      "--destructive-foreground": "0 0% 100%"
+    }
+  }
+}

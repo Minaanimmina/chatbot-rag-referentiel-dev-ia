@@ -1,4 +1,4 @@
-# Assistant RNCP Développeur IA 🎓
+# Assistant RNCP Développeur IA
 
 Bienvenue ! Je suis votre assistant pour analyser la couverture 
 de votre projet par rapport au référentiel RNCP Développeur en IA.

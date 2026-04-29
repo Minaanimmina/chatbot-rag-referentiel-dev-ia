@@ -1,0 +1,443 @@
+/* =============================================
+   CHARTE SIMPLON — Chainlit 2.x
+   Fond blanc, rouge #E5322D, bleu-vert #1A2E35
+   ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+
+/* ---------- Variables Simplon ---------- */
+:root {
+  --s-red:        #E5322D;
+  --s-red-dark:   #BF2420;
+  --s-teal:       #1A2E35;
+  --s-teal-mid:   #1A3C47;
+  --s-white:      #FFFFFF;
+  --s-offwhite:   #F7F7F7;
+  --s-light-gray: #EFEFEF;
+  --s-gray:       #6B7280;
+  --s-border:     #E5E7EB;
+  --s-text:       #1A2E35;
+}
+
+/* ---------- Base typographie ---------- */
+* {
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  color: inherit;
+}
+
+/* ---------- Fond global ---------- */
+body,
+#root,
+[class*="MuiBox-root"] > div:first-child {
+  background-color: var(--s-white) !important;
+  color: var(--s-text) !important;
+}
+
+/* ---------- Header ---------- */
+header {
+  background-color: var(--s-white) !important;
+  border-bottom: 1px solid var(--s-border) !important;
+  box-shadow: none !important;
+}
+
+/* Titre de l'app dans le header */
+header [class*="MuiTypography"] {
+  color: var(--s-teal) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em;
+}
+
+/* ---------- Sidebar ---------- */
+[class*="sidebar"],
+aside {
+  background-color: var(--s-offwhite) !important;
+  border-right: 1px solid var(--s-border) !important;
+}
+
+/* New Chat button dans la sidebar */
+[class*="sidebar"] button[class*="contained"] {
+  background-color: var(--s-teal) !important;
+  color: var(--s-white) !important;
+  border-radius: 6px !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+}
+
+[class*="sidebar"] button[class*="contained"]:hover {
+  background-color: var(--s-red) !important;
+}
+
+/* Items historique sidebar */
+[class*="sidebar"] [class*="MuiListItemButton"]:hover {
+  background-color: var(--s-light-gray) !important;
+}
+
+[class*="sidebar"] [class*="MuiListItemButton"][class*="selected"],
+[class*="sidebar"] [class*="MuiListItemButton"][class*="Mui-selected"] {
+  background-color: rgba(229, 50, 45, 0.08) !important;
+  border-left: 3px solid var(--s-red) !important;
+}
+
+/* ---------- Zone de chat principale ---------- */
+main {
+  background-color: var(--s-white) !important;
+}
+
+/* ---------- Bulles de messages — utilisateur ---------- */
+[data-author] [class*="message"]:has([class*="user"]),
+[class*="userMessage"],
+[class*="user-message"] {
+  background-color: var(--s-teal) !important;
+  color: var(--s-white) !important;
+  border-radius: 18px 18px 4px 18px !important;
+}
+
+/* ---------- Bulles de messages — assistant ---------- */
+[class*="assistantMessage"],
+[class*="assistant-message"],
+[class*="botMessage"] {
+  background-color: var(--s-offwhite) !important;
+  color: var(--s-text) !important;
+  border: 1px solid var(--s-border) !important;
+  border-radius: 4px 18px 18px 18px !important;
+}
+
+/* ---------- Avatar assistant ---------- */
+[class*="avatar"] {
+  background-color: var(--s-red) !important;
+  color: var(--s-white) !important;
+  font-weight: 700 !important;
+  border: none !important;
+}
+
+/* ---------- Nom de l'auteur ---------- */
+[class*="authorName"],
+[class*="author-name"] {
+  color: var(--s-red) !important;
+  font-weight: 600 !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ---------- Zone de saisie ---------- */
+[class*="inputBox"],
+[class*="input-box"],
+[class*="chatInput"],
+div[class*="MuiBox"]:has(textarea) {
+  background-color: var(--s-white) !important;
+  border-top: 1px solid var(--s-border) !important;
+}
+
+textarea {
+  background-color: var(--s-offwhite) !important;
+  color: var(--s-text) !important;
+  border: 1.5px solid var(--s-border) !important;
+  border-radius: 10px !important;
+  font-size: 1rem !important;
+  padding: 12px 16px !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+textarea:focus {
+  border-color: var(--s-red) !important;
+  box-shadow: 0 0 0 3px rgba(229, 50, 45, 0.12) !important;
+  outline: none !important;
+}
+
+textarea::placeholder {
+  color: var(--s-gray) !important;
+}
+
+/* ---------- Bouton envoyer ---------- */
+button[class*="send"],
+button[aria-label*="send"],
+button[aria-label*="Send"],
+button[aria-label*="Envoyer"] {
+  background-color: var(--s-red) !important;
+  color: var(--s-white) !important;
+  border-radius: 8px !important;
+  transition: background-color 0.2s, transform 0.15s !important;
+}
+
+button[class*="send"]:hover {
+  background-color: var(--s-red-dark) !important;
+  transform: scale(1.06);
+}
+
+/* ---------- Boutons MUI génériques ---------- */
+[class*="MuiButton-containedPrimary"] {
+  background-color: var(--s-teal) !important;
+  color: var(--s-white) !important;
+  border-radius: 6px !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  box-shadow: none !important;
+}
+
+[class*="MuiButton-containedPrimary"]:hover {
+  background-color: var(--s-red) !important;
+  box-shadow: none !important;
+}
+
+[class*="MuiButton-outlined"] {
+  border: 1.5px solid var(--s-teal) !important;
+  color: var(--s-teal) !important;
+  border-radius: 6px !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+}
+
+[class*="MuiButton-outlined"]:hover {
+  border-color: var(--s-red) !important;
+  color: var(--s-red) !important;
+  background-color: rgba(229, 50, 45, 0.04) !important;
+}
+
+/* ---------- Markdown dans les réponses ---------- */
+[class*="message"] h1,
+[class*="message"] h2,
+[class*="message"] h3 {
+  color: var(--s-teal) !important;
+  font-weight: 700;
+  border-bottom: 2px solid var(--s-red);
+  padding-bottom: 4px;
+  margin-bottom: 12px;
+}
+
+[class*="message"] h4,
+[class*="message"] h5 {
+  color: var(--s-teal) !important;
+  font-weight: 600;
+}
+
+[class*="message"] code {
+  background-color: rgba(26, 46, 53, 0.07) !important;
+  color: var(--s-red) !important;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.88em;
+}
+
+[class*="message"] pre {
+  background-color: var(--s-teal) !important;
+  color: #e2e8f0 !important;
+  border-radius: 8px !important;
+  border-left: 4px solid var(--s-red) !important;
+  padding: 16px !important;
+}
+
+[class*="message"] pre code {
+  background-color: transparent !important;
+  color: #e2e8f0 !important;
+  padding: 0 !important;
+}
+
+[class*="message"] a {
+  color: var(--s-red) !important;
+  font-weight: 500;
+}
+
+[class*="message"] blockquote {
+  border-left: 3px solid var(--s-red) !important;
+  padding-left: 12px;
+  color: var(--s-gray) !important;
+  font-style: italic;
+}
+
+[class*="message"] strong {
+  color: var(--s-teal) !important;
+  font-weight: 700;
+}
+
+/* ---------- Welcome screen / starters ---------- */
+[class*="welcome"],
+[class*="WelcomeScreen"] {
+  background-color: transparent !important;
+}
+
+[class*="welcome"] h1,
+[class*="welcome"] h2 {
+  color: var(--s-teal) !important;
+  font-weight: 700;
+}
+
+[class*="welcome"] p {
+  color: var(--s-gray) !important;
+}
+
+/* Starters (suggestions de questions) */
+[class*="starter"],
+[class*="Starter"] {
+  border: 1.5px solid var(--s-border) !important;
+  background-color: var(--s-white) !important;
+  border-radius: 10px !important;
+  color: var(--s-text) !important;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+[class*="starter"]:hover,
+[class*="Starter"]:hover {
+  border-color: var(--s-red) !important;
+  box-shadow: 0 2px 12px rgba(229, 50, 45, 0.12) !important;
+}
+
+/* ---------- Chips / badges (compétences RNCP) ---------- */
+[class*="MuiChip-root"] {
+  background-color: var(--s-light-gray) !important;
+  color: var(--s-text) !important;
+  border: 1px solid var(--s-border) !important;
+  font-weight: 500 !important;
+}
+
+[class*="MuiChip-colorPrimary"] {
+  background-color: var(--s-red) !important;
+  color: var(--s-white) !important;
+  border-color: var(--s-red) !important;
+}
+
+/* ---------- Loader ---------- */
+[class*="MuiCircularProgress"] {
+  color: var(--s-red) !important;
+}
+
+[class*="MuiLinearProgress"] [class*="bar"] {
+  background-color: var(--s-red) !important;
+}
+
+/* ---------- Toasts / snackbars ---------- */
+[class*="MuiSnackbar"] [class*="MuiPaper"] {
+  background-color: var(--s-white) !important;
+  border-left: 4px solid var(--s-red) !important;
+  color: var(--s-text) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
+}
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--s-offwhite); }
+::-webkit-scrollbar-thumb { background: var(--s-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--s-gray); }
+
+/* ---------- Chat submit button ---------- */
+#chat-submit {
+    transition: transform 0.15s, opacity 0.15s !important;
+}
+
+#chat-submit:hover {
+    transform: scale(1.1) !important;
+    opacity: 0.85 !important;
+}
+
+#chat-submit:active {
+    transform: scale(0.95) !important;
+    opacity: 1 !important;
+}
+
+/* Logo clair (déjà affiché par défaut) */
+.logo {
+    content: url('/public/img/logo_simplon.png');
+}
+
+/* ======================================================
+   DARK MODE — Charte Simplon adaptée pour thème sombre
+   ====================================================== */
+
+/* --- Redéfinition des variables Simplon en dark --- */
+.dark {
+  --s-red:        #E5322D;
+  --s-red-dark:   #BF2420;
+  --s-teal:       #7BBFCC;   /* bleu-vert clair pour contraste sur fond sombre */
+  --s-teal-mid:   #1A3C47;
+  --s-white:      #0D1F25;   /* fond principal dark */
+  --s-offwhite:   #112830;   /* fond cards dark */
+  --s-light-gray: #1A3340;   /* hover dark */
+  --s-gray:       #8A9FAA;
+  --s-border:     #1E3A45;
+  --s-text:       #E8F0F2;
+}
+
+/* --- Corrections spécifiques dark qui ne passent pas par les variables --- */
+
+/* Bulles utilisateur : on garde le rouge, lisible sur fond sombre */
+.dark [class*="userMessage"],
+.dark [class*="user-message"] {
+  background-color: var(--s-red) !important;
+  color: #FFFFFF !important;
+}
+
+/* Bulles assistant : fond card sombre */
+.dark [class*="assistantMessage"],
+.dark [class*="assistant-message"] {
+  background-color: #112830 !important;
+  border-color: #1E3A45 !important;
+  color: #E8F0F2 !important;
+}
+
+/* Header dark */
+.dark header {
+  background-color: #0D1F25 !important;
+  border-bottom-color: #1E3A45 !important;
+}
+
+/* Sidebar dark */
+.dark [class*="sidebar"],
+.dark aside {
+  background-color: #0A191F !important;
+  border-right-color: #1E3A45 !important;
+}
+
+.dark [class*="sidebar"] [class*="MuiListItemButton"][class*="Mui-selected"] {
+  background-color: rgba(229, 50, 45, 0.15) !important;
+  border-left-color: var(--s-red) !important;
+}
+
+/* Input dark */
+.dark textarea {
+  background-color: #112830 !important;
+  color: #E8F0F2 !important;
+  border-color: #1E3A45 !important;
+}
+
+.dark textarea::placeholder {
+  color: #5A7A88 !important;
+}
+
+/* Code dark */
+.dark [class*="message"] code {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  color: #FF8A87 !important;
+}
+
+.dark [class*="message"] pre {
+  background-color: #060F13 !important;
+  border-left-color: var(--s-red) !important;
+}
+
+/* Starters dark */
+.dark [class*="starter"],
+.dark [class*="Starter"] {
+  border-color: #1E3A45 !important;
+  background-color: #112830 !important;
+  color: #E8F0F2 !important;
+}
+
+.dark [class*="starter"]:hover {
+  border-color: var(--s-red) !important;
+}
+
+/* Scrollbar dark */
+.dark ::-webkit-scrollbar-track { background: #0A191F; }
+.dark ::-webkit-scrollbar-thumb { background: #1E3A45; }
+
+/* Titre principal de l'app en dark mode */
+.dark h2.scroll-m-20 {
+  color: #E8F0F2 !important;
+  border-bottom-color: #1E3A45 !important; /* la bordure pb-2 aussi */
+}
+
+/* Logo sombre */
+.dark .logo {
+    content: url('/public/img/logo_simplon_sombre.png');
+}

@@ -19,6 +19,14 @@ from config import (
 
 @cl.on_chat_start
 async def on_chat_start():
+    # await cl.Message(
+    #     content=(
+    #         "## Assistant RNCP Développeur IA\n\n"
+    #         "Je suis là pour analyser la couverture de votre projet par rapport au référentiel RNCP Dev IA.\n\n"
+    #         "Décrivez votre projet (technologies, tâches, outils) et je vous indique quelles compétences sont couvertes, partielles ou manquantes.\n\n"
+    #         "💡 *Utilisez les suggestions ci-dessous pour démarrer rapidement.*"
+    #     )
+    # ).send()
     embeddings = OllamaEmbeddings(
         model=EMBEDDING_MODEL,
         base_url=OLLAMA_BASE_URL
@@ -35,6 +43,29 @@ async def on_chat_start():
     cl.user_session.set("retriever", retriever)
     cl.user_session.set("llm", llm)
     cl.user_session.set("history", [])  # initialiser l'historique ici
+
+
+@cl.set_starters
+async def set_starters(users):
+    return [
+        cl.Starter(
+            label="🔍 Analyse rapide",
+            message="Mon projet utilise FastAPI et Docker.",
+        ),
+
+        cl.Starter(
+            label="⚙️ Projet MLOps",
+            message="Mon projet déploie une API FastAPI exposant un modèle LightGBM via Docker, avec un pipeline CI/CD GitHub Actions qui exécute des tests pytest automatiquement.",
+        ),
+        cl.Starter(
+            label="🏆 Projet complet",
+            message="Mon projet entraîne un modèle LightGBM sur des données d'accidents de la route, l'expose via une API FastAPI Dockerisée avec authentification. J'ai mis en place un monitoring avec Prometheus et Grafana, des tests automatisés pytest, un pipeline CI/CD GitHub Actions avec semantic release, et un dashboard Streamlit pour visualiser les prédictions.",
+        ),
+        cl.Starter(
+            label="👩‍🏫 Vue formateur",
+            message="Un apprenant m'a rendu un projet avec une API FastAPI Dockerisée et des tests pytest, mais sans CI/CD ni monitoring. Quelles compétences RNCP sont couvertes, lesquelles sont partielles, et que lui conseiller pour compléter son dossier avant la soutenance ?",
+        )
+    ]
 
 
 @cl.on_message
