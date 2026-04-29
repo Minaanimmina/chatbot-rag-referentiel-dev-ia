@@ -340,6 +340,23 @@ button[class*="send"]:hover {
     content: url('/public/img/logo_simplon.png');
 }
 
+/* Titre "Source N" dans les éléments inline */
+.text-2xl.font-semibold.leading-none {
+    font-size: 1.4rem !important;
+    font-weight: 600 !important;
+    border-bottom: none !important;
+    color: var(--s-teal) !important;
+}
+
+/* Titres h2 dans les sources inline */
+h2.scroll-m-20 {
+    font-size: 1.2rem !important;
+    font-weight: 600 !important;
+    border-bottom: 1px solid var(--s-border) !important;
+    margin-top: 8px !important;
+    color: var(--s-teal) !important;
+}
+
 /* ======================================================
    DARK MODE — Charte Simplon adaptée pour thème sombre
    ====================================================== */
