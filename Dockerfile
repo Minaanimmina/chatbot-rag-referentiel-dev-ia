@@ -26,8 +26,8 @@ LABEL description="Chainlit application for RNCP chatbot with RAG and referentie
 
 WORKDIR /app
 
-COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
+COPY --from=builder /.venv /.venv
+ENV PATH="/.venv/bin:$PATH"
 
 COPY . .
 COPY entrypoint.sh .
