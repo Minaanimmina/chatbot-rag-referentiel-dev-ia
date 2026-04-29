@@ -7,12 +7,14 @@ preserving semantic coherence of each competency.
 import re
 import sys
 from pathlib import Path
+
+from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_ollama import OllamaEmbeddings
-from langchain_chroma import Chroma
+
 from config import (
-    DATA_PATH,
     CHROMA_PATH,
+    DATA_PATH,
     EMBEDDING_MODEL,
     OLLAMA_BASE_URL,
 )
@@ -28,7 +30,7 @@ def load_and_chunk_by_competency(filepath: str) -> list[Document]:
     if not path.exists():
         raise FileNotFoundError(f"Referential file not found: {filepath}")
 
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         content = f.read()
 
     sections = re.split(r"\n(?=## )", content)
@@ -51,7 +53,7 @@ def load_and_chunk_by_competency(filepath: str) -> list[Document]:
                 "source": filepath,
                 "competency_code": code,
                 "title": title,
-            }
+            },
         )
         documents.append(doc)
 
@@ -69,14 +71,9 @@ def ingest(data_path: str, chroma_path: str) -> None:
         print(f"  - [{doc.metadata['competency_code']}] {doc.metadata['title'][:60]}")
 
     try:
-        embeddings = OllamaEmbeddings(
-            model=EMBEDDING_MODEL,
-            base_url=OLLAMA_BASE_URL
-        )
+        embeddings = OllamaEmbeddings(model=EMBEDDING_MODEL, base_url=OLLAMA_BASE_URL)
         Chroma.from_documents(
-            documents=documents,
-            embedding=embeddings,
-            persist_directory=chroma_path
+            documents=documents, embedding=embeddings, persist_directory=chroma_path
         )
     except Exception as e:
         raise RuntimeError(f"Erreur lors de l'ingestion dans ChromaDB : {e}") from e

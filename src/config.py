@@ -5,6 +5,7 @@ Loads environment variables and defines paths and model settings.
 
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 load_dotenv()

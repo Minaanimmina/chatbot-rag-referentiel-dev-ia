@@ -5,8 +5,7 @@ Provides the system message and message builder for analyzing projects
 against the RNCP AI Developer referential.
 """
 
-from langchain_core.messages import SystemMessage, HumanMessage
-
+from langchain_core.messages import HumanMessage, SystemMessage
 
 system_message = SystemMessage(
     content="""
@@ -46,7 +45,8 @@ system_message = SystemMessage(
     - Lis la description de chaque compétence avant de l'attribuer
     - Ne jamais inventer une compétence absente du contexte
     - Réponds toujours en français
-    """)
+    """
+)
 
 
 def build_human_message(context: str, question: str) -> HumanMessage:
@@ -55,4 +55,4 @@ def build_human_message(context: str, question: str) -> HumanMessage:
 
         Description du projet à analyser : {question}
         """
-        )
+    )
