@@ -49,3 +49,4 @@ chromadb_vector_database/
 
 # Chainlit
 .chainlit/
+build.log
