@@ -5,7 +5,7 @@ colorFrom: blue
 colorTo: purple
 sdk: docker
 app_port: 7860
-short_description: RAG chatbot on RNCP certification referential for Simplon Dev IA
+short_description: RAG chatbot on RNCP Dev IA referential - Simplon
 ---
 
 # Chatbot RAG — Référentiel RNCP Développeur en IA
