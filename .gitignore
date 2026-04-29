@@ -50,3 +50,7 @@ chromadb_vector_database/
 # Logs Docker
 build.log
 build.lo
+
+# Métadonnées Windows/WSL
+*.Zone.Identifier
+*:Zone.Identifier
