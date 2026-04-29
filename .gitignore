@@ -41,9 +41,6 @@ __pycache__/
 tempCodeRunnerFile.py
 .vscode/
 
-# ChromaDB database files
-chromadb_vector_database/
-
 # Chainlit
 .chainlit/
 
