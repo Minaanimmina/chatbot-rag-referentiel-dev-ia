@@ -1,3 +1,13 @@
+---
+title: Chatbot RAG RNCP Dev IA
+emoji: 🤖
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_port: 7860
+short_description: RAG chatbot on RNCP certification referential for Simplon Dev IA
+---
+
 # Chatbot RAG — Référentiel RNCP Développeur en IA
 
 ![Python](https://img.shields.io/badge/python-3.12-blue?logo=python&logoColor=white)
