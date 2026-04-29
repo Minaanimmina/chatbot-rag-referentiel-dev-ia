@@ -49,4 +49,7 @@ chromadb_vector_database/
 
 # Chainlit
 .chainlit/
+
+# Logs Docker
 build.log
+build.lo
