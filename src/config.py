@@ -18,3 +18,4 @@ DATA_PATH: str = str(BASE_DIR / "data" / "referentiel.md")
 LLM_MODEL: str = "qwen2.5:14b"
 K_CHUNKS: int = 10
 OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+MAX_HISTORY: int = 20

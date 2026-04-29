@@ -13,7 +13,8 @@ from config import (
     EMBEDDING_MODEL,
     LLM_MODEL,
     K_CHUNKS,
-    OLLAMA_BASE_URL
+    OLLAMA_BASE_URL,
+    MAX_HISTORY,
 )
 
 
@@ -80,8 +81,8 @@ async def set_starters(user: cl.User | None) -> list[cl.Starter]:
 async def on_message(message: cl.Message) -> None:
     """
     Traite chaque message entrant : récupère les chunks pertinents via le retriever,
-    construit le contexte avec l'historique, appelle le LLM et renvoie la réponse
-    accompagnée des sources.
+    construit le contexte avec l'historique, streame la réponse du LLM et affiche
+    les sources en fin de réponse.
     """
     retriever = cl.user_session.get("retriever")
     llm = cl.user_session.get("llm")
@@ -104,28 +105,33 @@ async def on_message(message: cl.Message) -> None:
     docs_text = "\n\n".join([doc.page_content for doc in docs])
     human_message = build_human_message(docs_text, message.content)
 
+    # Créer le message vide immédiatement
+    msg = cl.Message(content="")
+    await msg.send()
+
+    # Streamer les tokens au fur et à mesure
+    full_response = ""
     try:
-        response = await llm.ainvoke([system_message] + history + [human_message])
+        async for chunk in llm.astream([system_message] + history + [human_message]):
+            await msg.stream_token(chunk.content)
+            full_response += chunk.content
     except Exception:
-        await cl.Message(
-            content="Le service IA est temporairement indisponible. Veuillez réessayer dans quelques instants."
-        ).send()
+        msg.content = "Le service IA est temporairement indisponible. Veuillez réessayer."
+        await msg.update()
         return
 
-    history.append(human_message)
-    history.append(AIMessage(content=response.content))
-    cl.user_session.set("history", history)
-
-    source_elements = [
-        cl.Text(
-            name=f"Source {i+1}",
-            content=doc.page_content,
-            display="inline"
-        )
-        for i, doc in enumerate(docs)
+    # Ajouter les sources au message une fois le stream terminé
+    msg.elements = [ # type: ignore[assignment]
+    cl.Text(
+        name=f"Source {i+1}",
+        content=doc.page_content,
+        display="side"
+    )
+    for i, doc in enumerate(docs)
     ]
+    await msg.update()
 
-    await cl.Message(
-        content=response.content,
-        elements=source_elements
-    ).send()
+    # Mettre à jour l'historique
+    history.append(human_message)
+    history.append(AIMessage(content=full_response))
+    cl.user_session.set("history", history[-MAX_HISTORY:])
