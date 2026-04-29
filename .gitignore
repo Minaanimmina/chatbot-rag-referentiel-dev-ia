@@ -41,6 +41,10 @@ __pycache__/
 tempCodeRunnerFile.py
 .vscode/
 
+# Chainlit
+.chainlit/translations/
+!.chainlit/translations/fr-FR.json
+
 # Logs Docker
 build.log
 build.lo

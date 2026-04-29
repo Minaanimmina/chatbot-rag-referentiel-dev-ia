@@ -15,13 +15,17 @@ short_description: RAG chatbot on RNCP Dev IA referential - Simplon
 ![LangChain](https://img.shields.io/badge/LangChain-RAG-orange)
 ![ChromaDB](https://img.shields.io/badge/ChromaDB-vector%20db-purple)
 ![Docker](https://img.shields.io/badge/Docker-enabled-blue?logo=docker)
-![Ollama](https://img.shields.io/badge/Ollama-local%20LLM-red)
+![Groq](https://img.shields.io/badge/Groq-LLM-orange)
+![HuggingFace](https://img.shields.io/badge/HuggingFace-embeddings-yellow)
+![HF Spaces](https://img.shields.io/badge/HuggingFace-Spaces-blue)
 
 ## À propos
 
 Chatbot RAG alimenté par le **référentiel RNCP certification 37827** *(Développeur en Intelligence Artificielle, niveau 6)*, permettant aux apprenants et formateurs **Simplon** d'analyser la couverture d'un projet par rapport aux compétences requises.
 
 Cet outil exploite une architecture **Retrieval-Augmented Generation (RAG)** pour fournir des réponses précises et sourcées directement du référentiel officiel.
+
+🚀 **[Accéder à l'application déployée](https://huggingface.co/spaces/minaanim/chatbot-rag-rncp-devia)**
 
 ---
 
@@ -66,13 +70,13 @@ Ce chatbot RAG permet de :
 
 3  EMBED (Vectorisation)
     │
-    ├─ Modèle : nomic-embed-text (via Ollama)
+    ├─ Modèle : all-MiniLM-L6-v2 (HuggingFace sentence-transformers)
     │
     └─→ Embeddings stockés dans ChromaDB
 
 4  STORE/RETRIEVE (Stockage & Récupération)
     │
-    ├─ Base vectorielle : ChromaDB (persistante)
+    ├─ Base vectorielle : ChromaDB (persistante, pré-générée)
     │
     ├─ Recherche : similarité cosinus
     │  (récupère les K chunks les plus similaires)
@@ -82,7 +86,7 @@ Ce chatbot RAG permet de :
     ⬇ ENRICHISSEMENT DU PROMPT
 
     ┌─────────────────────────────────┐
-    │ LLM Ollama (qwen2.5:14b)        │
+    │ LLM Groq (llama-3.1-8b-instant) │
     │ + contexte du référentiel       │
     │ + historique de conversation    │
     └─────────────────────────────────┘
@@ -97,13 +101,13 @@ Utilisateur
     ↓
 Chainlit UI
     ↓
-Vectorisation de la requête (nomic-embed-text)
+Vectorisation de la requête (all-MiniLM-L6-v2)
     ↓
 Recherche dans ChromaDB (top-K chunks)
     ↓
 Construction du contexte RAG
     ↓
-LLM Ollama + System Prompt
+LLM Groq (llama-3.1-8b-instant) + System Prompt
     ↓
 Réponse streamée + Sources affichées
     ↓
@@ -116,37 +120,30 @@ Historique conservé par session (max 20 messages)
 
 | Composant | Technologie | Version | Rôle |
 |-----------|-------------|---------|------|
-| **LLM** | Ollama + Qwen2.5 | 14B | Génération de réponses |
-| **Embeddings** | Ollama + Nomic-Embed-Text | latest | Vectorisation texte |
+| **LLM** | Groq — llama-3.1-8b-instant | latest | Génération de réponses (API) |
+| **Embeddings** | HuggingFace — all-MiniLM-L6-v2 | latest | Vectorisation texte (local) |
 | **Orchestration RAG** | LangChain | latest | Chaîne RAG complète |
 | **Interface conversationnelle** | Chainlit | 2.x | UI interactive avec streaming |
 | **Base vectorielle** | ChromaDB | latest | Stockage persistant des embeddings |
 | **Runtime Python** | Python | 3.12 | Exécution |
 | **Gestionnaire dépendances** | uv | latest | Installation rapide |
-| **Conteneurisation** | Docker + Compose | latest | Déploiement isolé |
+| **Conteneurisation** | Docker | latest | Déploiement isolé |
+| **Déploiement** | Hugging Face Spaces | — | Hébergement public gratuit |
 
 ---
 
 ## Prérequis
 
-### Pour les deux modes
-
-- **Ollama** installé et en cours d'exécution ([ollama.ai](https://ollama.ai))
-- Modèles téléchargés :
-  ```bash
-  ollama pull qwen2.5:14b
-  ollama pull nomic-embed-text
-  ```
-
 ### Mode local uniquement
 
 - **Python** ≥ 3.12
 - **uv** installé ([astral-sh/uv](https://github.com/astral-sh/uv))
+- Une clé API **Groq** gratuite ([console.groq.com](https://console.groq.com))
 
 ### Mode Docker uniquement
 
-- **Docker** ≥ 20.10 + **Docker Compose** ≥ 2.0
-- Ollama doit tourner sur la machine hôte (le container communique via `host.docker.internal`)
+- **Docker** ≥ 20.10
+- Une clé API **Groq** gratuite
 
 ---
 
@@ -164,9 +161,12 @@ uv sync
 
 # 3. Configurer les variables d'environnement
 cp .env.example .env
-# Éditer .env si nécessaire
+# Éditer .env et renseigner votre clé Groq :
+# GROQ_API_KEY=your_groq_api_key_here
 
-# 4. Ingérer le référentiel dans ChromaDB (première exécution uniquement)
+# 4. (Optionnel) Régénérer la base vectorielle ChromaDB
+# La base est déjà pré-générée dans le repo — cette étape n'est nécessaire
+# que si vous modifiez data/referentiel.md
 uv run python src/ingest.py
 
 # 5. Lancer l'application
@@ -186,19 +186,35 @@ cd chatbot-rag-referentiel-dev-ia
 
 # 2. Configurer les variables d'environnement
 cp .env.example .env
+# Éditer .env et renseigner votre clé Groq
 
 # 3. Lancer le container
-docker compose up --build
+docker build -t chatbot-rag .
+docker run -p 7860:7860 --env-file .env chatbot-rag
 ```
 
-L'application est accessible à `http://localhost:8001`
+L'application est accessible à `http://localhost:7860`
 
-> ⚠️ Ollama doit tourner sur la machine hôte. Le container communique avec lui via `host.docker.internal:11434`.
+---
+
+### Mode 3 : Hugging Face Spaces
+
+L'application est déployée publiquement sur Hugging Face Spaces :
+
+🚀 **[huggingface.co/spaces/minaanim/chatbot-rag-rncp-devia](https://huggingface.co/spaces/minaanim/chatbot-rag-rncp-devia)**
+
+Pour déployer votre propre instance :
 
 ```bash
-# Arrêter
-docker compose down
+# Ajouter le Space comme remote git
+git remote add hf-space https://huggingface.co/spaces/<votre-username>/<votre-space>
+
+# Pousser la branche vers HF Spaces
+git push hf-space main --force
 ```
+
+Configurer ensuite la variable d'environnement dans **Settings → Variables and secrets** du Space :
+- `GROQ_API_KEY` : votre clé API Groq
 
 ---
 
@@ -209,7 +225,7 @@ docker compose down
 Créez un fichier `.env` à la racine (ou consultez `.env.example`) :
 
 ```env
-OLLAMA_BASE_URL=http://localhost:11434
+GROQ_API_KEY=your_groq_api_key_here
 ```
 
 Toutes les autres constantes (modèles, chemins, paramètres RAG) sont configurées dans `src/config.py`.
@@ -240,38 +256,60 @@ Le chatbot propose quatre scénarios de démarrage :
 chatbot-rag-referentiel-dev-ia/
 │
 ├── src/
-│   ├── app.py                  # Application Chainlit principale
-│   ├── config.py               # Configuration + chargement .env
-│   ├── prompts.py              # Prompts système + construction messages
-│   └── ingest.py               # Ingestion du référentiel dans ChromaDB
+│   ├── app.py                        # Application Chainlit principale
+│   ├── config.py                     # Configuration + chargement .env
+│   ├── prompts.py                    # Prompts système + construction messages
+│   └── ingest.py                     # Ingestion du référentiel dans ChromaDB
 │
 ├── data/
-│   └── referentiel.md          # Référentiel RNCP source (structuré par compétence)
+│   └── referentiel.md                # Référentiel RNCP source (structuré par compétence)
 │
 ├── public/
-│   ├── custom.css              # Charte graphique Simplon
-│   ├── theme.json              # Variables de thème Chainlit
-│   └── img/                    # Assets (logos)
+│   ├── custom.css                    # Charte graphique Simplon
+│   ├── theme.json                    # Variables de thème Chainlit
+│   └── img/                          # Assets (logos)
 │
-├── chromadb_vector_database/   # Base vectorielle persistante (ignorée par git)
+├── chromadb_vector_database/         # Base vectorielle pré-générée (commitée)
 │
-├── docker-compose.yml          # Orchestration conteneurs
-├── Dockerfile                  # Image application
-├── entrypoint.sh               # Script de démarrage (ingestion + lancement)
-├── pyproject.toml              # Dépendances Python (uv)
-├── .env.example                # Template variables d'environnement
-├── chainlit.md                 # Documentation accessible via "Lisez-moi"
+├── .chainlit/
+│   ├── config.toml                   # Configuration Chainlit (langue, UI, logo)
+│   └── translations/fr-FR.json      # Traduction française de l'interface
+│
+├── docker-compose.yml                # Orchestration conteneurs (développement local)
+├── Dockerfile                        # Image application (compatible HF Spaces)
+├── pyproject.toml                    # Dépendances Python (uv)
+├── .pre-commit-config.yaml           # Hooks pre-commit (ruff + mypy)
+├── .env.example                      # Template variables d'environnement
+├── chainlit.md                       # Documentation accessible via "Lisez-moi"
 └── .gitignore
+```
+
+---
+
+## Qualité du code
+
+Ce projet utilise des hooks **pre-commit** pour garantir la qualité du code :
+
+- **ruff** — linting et formatage automatique
+- **mypy** — vérification statique des types
+
+```bash
+# Installer les hooks
+uv run pre-commit install
+
+# Lancer manuellement sur tous les fichiers
+uv run pre-commit run --all-files
 ```
 
 ---
 
 ## Limites connues
 
-- Qualité des réponses dépend de la qualité du référentiel Markdown source
-- Modèle Qwen2.5 14B : temps de réponse variable selon le matériel (16 GB RAM recommandés)
+- La qualité des réponses dépend de la qualité du référentiel Markdown source
+- Le modèle `llama-3.1-8b-instant` est plus léger que `qwen2.5:14b` — les réponses peuvent être moins détaillées sur des questions complexes
 - Pas de persistance multi-session (par conception)
-- Ollama doit être en cours d'exécution avant de lancer l'application
+- Sur HF Spaces (tier gratuit) : le Space s'endort après inactivité, le démarrage à froid prend ~1 minute
+- Le modèle d'embeddings (`sentence-transformers`) tire PyTorch comme dépendance — l'image Docker est volumineuse (~2GB)
 
 ---
 
@@ -289,7 +327,9 @@ Réalisé par **Mina Guinchard**, en formation à Simplon Lyon (2025-2026)
 - [Documentation Chainlit](https://docs.chainlit.io)
 - [Documentation LangChain](https://python.langchain.com)
 - [Documentation ChromaDB](https://docs.trychroma.com)
-- [Documentation Ollama](https://ollama.ai)
+- [Documentation Groq](https://console.groq.com/docs)
+- [HuggingFace sentence-transformers](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
+- [Hugging Face Spaces — Docker](https://huggingface.co/docs/hub/spaces-sdks-docker)
 
 ---
 
