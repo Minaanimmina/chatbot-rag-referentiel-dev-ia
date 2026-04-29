@@ -7,8 +7,8 @@ from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
 from langchain_ollama import ChatOllama
 from langchain_core.messages import AIMessage, BaseMessage
-from src.prompts import system_message, build_human_message
-from src.config import (
+from prompts import system_message, build_human_message
+from config import (
     CHROMA_PATH,
     EMBEDDING_MODEL,
     LLM_MODEL,

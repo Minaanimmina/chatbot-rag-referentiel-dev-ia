@@ -4,7 +4,7 @@ Chunks by competency block (## Cx) instead of by character size,
 preserving semantic coherence of each competency.
 """
 
-from src.config import (
+from config import (
     DATA_PATH,
     CHROMA_PATH,
     EMBEDDING_MODEL,
