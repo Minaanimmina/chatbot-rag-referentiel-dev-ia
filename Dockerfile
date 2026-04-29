@@ -10,10 +10,11 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
-ENV UV_SYSTEM_PYTHON=1
+WORKDIR /app
+ENV UV_COMPILE_BYTECODE=1
 
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen
+RUN uv sync --frozen --no-dev
 
 # ============================================
 # Stage 2 : FINAL - image de production
@@ -26,17 +27,16 @@ LABEL description="Chainlit application for RNCP chatbot with RAG and referentie
 
 WORKDIR /app
 
-COPY --from=builder /.venv /.venv
-ENV PATH="/.venv/bin:$PATH"
+COPY --from=builder /app/.venv /app/.venv
+ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONPATH=/app/src
 
 COPY . .
-COPY entrypoint.sh .
-RUN chmod +x entrypoint.sh
 
 RUN useradd -m -u 1000 appuser && \
     chown -R appuser:appuser /app
 USER appuser
 
-EXPOSE 8000
+EXPOSE 7860
 
-CMD ["./entrypoint.sh"]
+CMD ["chainlit", "run", "src/app.py", "--host", "0.0.0.0", "--port", "7860"]
