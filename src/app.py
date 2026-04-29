@@ -18,41 +18,49 @@ from config import (
 
 
 @cl.on_chat_start
-async def on_chat_start():
-    # await cl.Message(
-    #     content=(
-    #         "## Assistant RNCP Développeur IA\n\n"
-    #         "Je suis là pour analyser la couverture de votre projet par rapport au référentiel RNCP Dev IA.\n\n"
-    #         "Décrivez votre projet (technologies, tâches, outils) et je vous indique quelles compétences sont couvertes, partielles ou manquantes.\n\n"
-    #         "💡 *Utilisez les suggestions ci-dessous pour démarrer rapidement.*"
-    #     )
-    # ).send()
-    embeddings = OllamaEmbeddings(
-        model=EMBEDDING_MODEL,
-        base_url=OLLAMA_BASE_URL
-    )
-    vectorstore = Chroma(
-        embedding_function=embeddings,
-        persist_directory=CHROMA_PATH
-    )
-    retriever = vectorstore.as_retriever(search_kwargs={"k": K_CHUNKS})
-    llm = ChatOllama(
-        model=LLM_MODEL,
-        base_url=OLLAMA_BASE_URL
-    )
+async def on_chat_start() -> None:
+    """
+    Initialise la session utilisateur : embeddings, vectorstore, LLM et historique.
+    En cas d'échec (Ollama indisponible, ChromaDB corrompue), informe l'utilisateur
+    avec un message générique et interrompt l'initialisation.
+    """
+    try:
+        embeddings = OllamaEmbeddings(
+            model=EMBEDDING_MODEL,
+            base_url=OLLAMA_BASE_URL
+        )
+        vectorstore = Chroma(
+            embedding_function=embeddings,
+            persist_directory=CHROMA_PATH
+        )
+        retriever = vectorstore.as_retriever(search_kwargs={"k": K_CHUNKS})
+        llm = ChatOllama(
+            model=LLM_MODEL,
+            base_url=OLLAMA_BASE_URL
+        )
+    except Exception:
+        await cl.Message(
+            content="Le service IA n'est pas disponible. Veuillez réessayer dans quelques instants."
+        ).send()
+        return
+
     cl.user_session.set("retriever", retriever)
     cl.user_session.set("llm", llm)
-    cl.user_session.set("history", [])  # initialiser l'historique ici
+    cl.user_session.set("history", [])
 
 
 @cl.set_starters
-async def set_starters(users):
+async def set_starters(user: cl.User | None) -> list[cl.Starter]:
+    """
+    Définit les suggestions de démarrage affichées sur l'écran d'accueil.
+    Couvre trois niveaux de description de projet (vague, moyen, complet)
+    et un cas d'usage formateur.
+    """
     return [
         cl.Starter(
             label="🔍 Analyse rapide",
             message="Mon projet utilise FastAPI et Docker.",
         ),
-
         cl.Starter(
             label="⚙️ Projet MLOps",
             message="Mon projet déploie une API FastAPI exposant un modèle LightGBM via Docker, avec un pipeline CI/CD GitHub Actions qui exécute des tests pytest automatiquement.",
@@ -69,41 +77,54 @@ async def set_starters(users):
 
 
 @cl.on_message
-async def on_message(message: cl.Message):
+async def on_message(message: cl.Message) -> None:
+    """
+    Traite chaque message entrant : récupère les chunks pertinents via le retriever,
+    construit le contexte avec l'historique, appelle le LLM et renvoie la réponse
+    accompagnée des sources.
+    """
     retriever = cl.user_session.get("retriever")
     llm = cl.user_session.get("llm")
     if not retriever or not llm:
-        await cl.Message(content="Erreur : session non initialisée.").send()
+        await cl.Message(
+            content="La session n'est pas initialisée. Veuillez rafraîchir la page."
+        ).send()
         return
 
     history: list[BaseMessage] = cl.user_session.get("history") or []
 
-    docs = retriever.invoke(message.content)
+    try:
+        docs = await retriever.ainvoke(message.content)
+    except Exception:
+        await cl.Message(
+            content="Impossible d'accéder à la base de connaissances. Veuillez réessayer."
+        ).send()
+        return
+
     docs_text = "\n\n".join([doc.page_content for doc in docs])
     human_message = build_human_message(docs_text, message.content)
 
     try:
-        response = llm.invoke([system_message] + history + [human_message])
-    except Exception as e:
-        await cl.Message(content=f"Erreur LLM : {str(e)}").send()
+        response = await llm.ainvoke([system_message] + history + [human_message])
+    except Exception:
+        await cl.Message(
+            content="Le service IA est temporairement indisponible. Veuillez réessayer dans quelques instants."
+        ).send()
         return
 
     history.append(human_message)
     history.append(AIMessage(content=response.content))
     cl.user_session.set("history", history)
 
-    # Créer les éléments sources
-    source_elements = []
-    for i, doc in enumerate(docs):
-        source_elements.append(
-            cl.Text(
-                name=f"Source {i+1}",
-                content=doc.page_content,
-                display="side"
-            )
+    source_elements = [
+        cl.Text(
+            name=f"Source {i+1}",
+            content=doc.page_content,
+            display="inline"
         )
+        for i, doc in enumerate(docs)
+    ]
 
-    # Envoyer la réponse avec les sources
     await cl.Message(
         content=response.content,
         elements=source_elements
