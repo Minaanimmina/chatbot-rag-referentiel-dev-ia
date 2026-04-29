@@ -6,14 +6,14 @@ FROM python:3.12-slim AS builder
 
 RUN apt-get update && apt-get install -y \
     gcc \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 ENV UV_SYSTEM_PYTHON=1
 
 COPY pyproject.toml uv.lock ./
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv pip install .
+RUN uv sync --frozen
 
 # ============================================
 # Stage 2 : FINAL - image de production
