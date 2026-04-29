@@ -1,36 +1,74 @@
 """
-Script to ingest the markdown file into a ChromaDB vector database. It uses
-the TextSplitter from LangChain to split the text into chunks, and the Nomic
-embedding model to create embeddings for each chunk. The embeddings are then
-stored in a ChromaDB vector database for later retrieval.
+Script to ingest the RNCP referential markdown into ChromaDB.
+Chunks by competency block (## Cx) instead of by character size,
+preserving semantic coherence of each competency.
 """
 
 from config import (
     DATA_PATH,
-    CHUNK_SIZE,
-    CHUNK_OVERLAP,
     CHROMA_PATH,
     EMBEDDING_MODEL,
+    OLLAMA_BASE_URL,
 )
-from langchain_community.document_loaders import TextLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+import re
+from langchain_core.documents import Document
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
 
-loader = TextLoader(DATA_PATH, encoding="utf-8")
-documents = loader.load()
 
-text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=CHUNK_SIZE,
-    chunk_overlap=CHUNK_OVERLAP)
-texts = text_splitter.split_documents(documents)
+def load_and_chunk_by_competency(filepath: str) -> list[Document]:
+    """
+    Split the markdown file into chunks, one per competency block (## Cx / ## Bloc).
+    Adds metadata: competency code, block title.
+    """
+    with open(filepath, "r", encoding="utf-8") as f:
+        content = f.read()
 
-embeddings = OllamaEmbeddings(model=EMBEDDING_MODEL)
+    # Split on ## headers (competency blocks)
+    sections = re.split(r"\n(?=## )", content)
+
+    documents = []
+    for section in sections:
+        section = section.strip()
+        if not section:
+            continue
+
+        # Extract competency code from header (e.g. "C9", "C18", "BLOC 1")
+        header_match = re.match(r"## (.+)", section)
+        title = header_match.group(1).strip() if header_match else "Unknown"
+
+        # Extract Cx/Ax/Ex code if present
+        code_match = re.match(r"## (C\d+|A\d+|E\d+|BLOC \d+)", section)
+        code = code_match.group(1) if code_match else "misc"
+
+        doc = Document(
+            page_content=section,
+            metadata={
+                "source": filepath,
+                "competency_code": code,
+                "title": title,
+            }
+        )
+        documents.append(doc)
+
+    return documents
+
+
+documents = load_and_chunk_by_competency(DATA_PATH)
+
+print(f"{len(documents)} chunks créés (un par compétence)")
+for doc in documents:
+    print(f"  - [{doc.metadata['competency_code']}] {doc.metadata['title'][:60]}")
+
+embeddings = OllamaEmbeddings(
+    model=EMBEDDING_MODEL,
+    base_url=OLLAMA_BASE_URL
+)
 
 vectorstore = Chroma.from_documents(
-    documents=texts,
+    documents=documents,
     embedding=embeddings,
     persist_directory=CHROMA_PATH
 )
 
-print("✅ Data successfully stored in ChromaDB!")
+print("Référentiel ingéré dans ChromaDB par compétence")
