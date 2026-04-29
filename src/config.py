@@ -1,13 +1,20 @@
+"""
+Configuration constants for the RNCP RAG chatbot application.
+Loads environment variables and defines paths and model settings.
+"""
+
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
 
-CHUNK_SIZE = 1500
-CHUNK_OVERLAP = 100
-EMBEDDING_MODEL = "nomic-embed-text"
-CHROMA_PATH = "chromadb_vector_database"
-DATA_PATH = "data/referentiel.md"
-LLM_MODEL = "qwen2.5:14b"
-K_CHUNKS = 10
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+# Base directory for path resolution
+BASE_DIR: Path = Path(__file__).parent.parent
+
+EMBEDDING_MODEL: str = "nomic-embed-text"
+CHROMA_PATH: str = str(BASE_DIR / "chromadb_vector_database")
+DATA_PATH: str = str(BASE_DIR / "data" / "referentiel.md")
+LLM_MODEL: str = "qwen2.5:14b"
+K_CHUNKS: int = 10
+OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
