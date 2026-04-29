@@ -41,9 +41,6 @@ __pycache__/
 tempCodeRunnerFile.py
 .vscode/
 
-# Generated data
-data/*.md
-
 # ChromaDB database files
 chromadb_vector_database/
 
