@@ -5,15 +5,16 @@ Chainlit application for RNCP competency analysis.
 import chainlit as cl
 from langchain_chroma import Chroma
 from langchain_core.messages import AIMessage, BaseMessage
-from langchain_ollama import ChatOllama, OllamaEmbeddings
+from langchain_groq import ChatGroq
+from langchain_huggingface import HuggingFaceEmbeddings
 
 from config import (
     CHROMA_PATH,
     EMBEDDING_MODEL,
+    GROQ_API_KEY,
     K_CHUNKS,
     LLM_MODEL,
     MAX_HISTORY,
-    OLLAMA_BASE_URL,
 )
 from prompts import build_human_message, system_message
 
@@ -26,12 +27,12 @@ async def on_chat_start() -> None:
     avec un message générique et interrompt l'initialisation.
     """
     try:
-        embeddings = OllamaEmbeddings(model=EMBEDDING_MODEL, base_url=OLLAMA_BASE_URL)
+        embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
         vectorstore = Chroma(
             embedding_function=embeddings, persist_directory=CHROMA_PATH
         )
         retriever = vectorstore.as_retriever(search_kwargs={"k": K_CHUNKS})
-        llm = ChatOllama(model=LLM_MODEL, base_url=OLLAMA_BASE_URL)
+        llm = ChatGroq(model=LLM_MODEL, api_key=GROQ_API_KEY)
     except Exception:
         await cl.Message(
             content="Le service IA n'est pas disponible. Veuillez réessayer dans quelques instants."

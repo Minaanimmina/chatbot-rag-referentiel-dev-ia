@@ -10,13 +10,12 @@ from pathlib import Path
 
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
-from langchain_ollama import OllamaEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 from config import (
     CHROMA_PATH,
     DATA_PATH,
     EMBEDDING_MODEL,
-    OLLAMA_BASE_URL,
 )
 
 
@@ -71,7 +70,7 @@ def ingest(data_path: str, chroma_path: str) -> None:
         print(f"  - [{doc.metadata['competency_code']}] {doc.metadata['title'][:60]}")
 
     try:
-        embeddings = OllamaEmbeddings(model=EMBEDDING_MODEL, base_url=OLLAMA_BASE_URL)
+        embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
         Chroma.from_documents(
             documents=documents, embedding=embeddings, persist_directory=chroma_path
         )
