@@ -156,7 +156,7 @@ alert_style = "classic"
 logo_file_url = "/public/img/logo_simplon.png"
 
 # Load assistant avatar image directly from URL.
-default_avatar_file_url = ""
+default_avatar_file_url = "/public/img/avatar_simplon.png"
 
 # Avatar size in pixels (default: 20).
 # avatar_size = 20
